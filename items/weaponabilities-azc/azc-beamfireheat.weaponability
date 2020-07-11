@@ -1,30 +1,43 @@
 {
   "ability" : {
-    "type" : "azreload",
-    "class" : "Reload",
-    "name" : "Reload",
-    "scripts" : ["/items/weaponabilities/azreload.lua"],
+    "type" : "azc-beamfireheat",
+    "class" : "GunFire",
+    "name" : "Beam",
+    "scripts" : ["/items/weaponabilities-azc/azc-beamfireheat.lua"],
 
-	"fireTime" : 0.6,
+    "fireTime" : 0.6,
     "baseDps" : 6.25,
     "energyUsage" : 18.75,
     "inaccuracy" : 0.025,
 	
-	"reloadQuantity" : -1,
-	"reloadAdditive" : false,
+	"heatMax" : 100,
+	"heatGeneration" : 5,
+	"heatWait" : 0.5,
+	"heatCoolSpeed" : 30,
 	
-	"eject" : true,
-	"projectileType" : "az_case_generic",
-	"projectileCount" : 1,
-	"ejectOffset" : [1.0, 0.3],
-	"ejectPart" : "middle",
-	"ejectRotate" : 180,
+	"beamLength" : 20,
 	
-	"terminateIteration" : 2,
-	"reloadIteration" : 1,
-	
-	"reloadStanceChain" : "anim",
+	"damageConfig" : {
+      "statusEffects" : [ ],
+      "damageSourceKind" : "plasma",
+      "knockback" : 2
+    },
 
+    "chain" : {
+      "startOffset" : [0, 0],
+      "segmentImage" : "/items/active/weapons/protectorate/aegisaltpistol/beam.png",
+      "endSegmentImage" : "/items/active/weapons/protectorate/aegisaltpistol/beamend.png",
+      "segmentSize" : 0.48,
+      "overdrawLength" : 0.2,
+      "taper" : 0,
+      "waveform" : {
+        "frequency" : 2.0,
+        "amplitude" : 0.125,
+        "movement" : 40.0
+      },
+      "fullbright" : true
+    },
+	
     "stances" : {
       "idle" : {
         "armRotation" : 0,
@@ -40,8 +53,8 @@
         "weaponRotation" : 3,
         "twoHanded" : false,
 
-        "allowRotate" : true,
-        "allowFlip" : true
+        "allowRotate" : false,
+        "allowFlip" : false
       },
       "cooldown" : {
         "duration" : 0.15,
@@ -49,12 +62,10 @@
         "weaponRotation" : 3,
         "twoHanded" : false,
 
-        "allowRotate" : true,
-        "allowFlip" : true
+        "allowRotate" : false,
+        "allowFlip" : false
       },
-	  
-	  
-      "anim0" : {
+	  "overheat0" : {
         "duration" : 0.2,
         "armRotation" : 0,
         "weaponRotation" : 0,
@@ -63,10 +74,10 @@
         "allowRotate" : true,
         "allowFlip" : true,
 		
-		"followUp" : "anim1"
+		"followUp" : "overheat1"
       },
-      "anim1" : {
-        "duration" : 0.1,
+      "overheat1" : {
+        "duration" : 1.5,
         "armRotation" : 5,
         "weaponRotation" : 90,
 		
@@ -75,9 +86,9 @@
         "allowRotate" : true,
         "allowFlip" : true,
 		
-		"followUp" : "anim2"
+		"followUp" : "overheat2"
       },
-      "anim2" : {
+      "overheat2" : {
         "duration" : 0.2,
         "armRotation" : 15,
         "weaponRotation" : 90,

@@ -1,22 +1,19 @@
 {
   "ability" : {
-    "type" : "azgunfireheat",
+    "type" : "azc-gunfireammo",
     "class" : "GunFire",
     "name" : "Gunshot",
-    "scripts" : ["/items/weaponabilities/azgunfireheat.lua"],
+    "scripts" : ["/items/weaponabilities-azc/azc-gunfireammo.lua"],
 
     "fireTime" : 0.6,
     "baseDps" : 6.25,
     "energyUsage" : 18.75,
     "inaccuracy" : 0.025,
-	
-	"heatMax" : 100,
-	"heatPerShot" : 5,
-	"heatWait" : 2,
-	"heatCoolSpeed" : 25,
 
     "projectileCount" : 1,
     "fireType" : "auto",
+	
+	"defaultHanded" : "two",
 
     "projectileType" : "azbulletgeneric",
     "projectileParameters" : {
@@ -26,7 +23,7 @@
       "idle" : {
         "armRotation" : 0,
         "weaponRotation" : 0,
-        "twoHanded" : false,
+        "twoHanded" : true,
 
         "allowRotate" : true,
         "allowFlip" : true
@@ -35,12 +32,39 @@
         "duration" : 0,
         "armRotation" : 3,
         "weaponRotation" : 3,
-        "twoHanded" : false,
+        "twoHanded" : true,
 
         "allowRotate" : false,
         "allowFlip" : false
       },
       "cooldown" : {
+        "duration" : 0.15,
+        "armRotation" : 3,
+        "weaponRotation" : 3,
+        "twoHanded" : true,
+
+        "allowRotate" : false,
+        "allowFlip" : false
+      },
+	  
+      "alt-idle" : {
+        "armRotation" : 0,
+        "weaponRotation" : 0,
+        "twoHanded" : false,
+
+        "allowRotate" : true,
+        "allowFlip" : true
+      },
+      "alt-fire" : {
+        "duration" : 0,
+        "armRotation" : 3,
+        "weaponRotation" : 3,
+        "twoHanded" : false,
+
+        "allowRotate" : false,
+        "allowFlip" : false
+      },
+      "alt-cooldown" : {
         "duration" : 0.15,
         "armRotation" : 3,
         "weaponRotation" : 3,

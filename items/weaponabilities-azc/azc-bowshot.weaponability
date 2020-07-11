@@ -1,9 +1,9 @@
 {
   "ability" : {
-    "type" : "azbowshot",
+    "type" : "azc-bowshot",
     "class" : "BowShot",
     "name" : "Bow Shot",
-    "scripts" : ["/items/weaponabilities/azbowshot.lua"],
+    "scripts" : ["/items/weaponabilities-azc/azc-bowshot.lua"],
 
     "walkWhileFiring" : true,
 
