@@ -1,0 +1,7 @@
+{
+  "name" : "az-core",
+  "friendlyName" : "AzCore",
+  "description" : "A foundation. Not intended for independent distribution.",
+  "author" : "Azulaloi",
+  "version" : "0.0"
+}
