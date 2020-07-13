@@ -2,31 +2,31 @@
   {
     "op": "add",
     "path": "/flurrycombo",
-    "value": "/items/weaponabilities-azc/flurrycombo.weaponability"
+    "value": "/items/weapons/abilities/flurrycombo.weaponability"
   },
   {
     "op": "add",
     "path": "/azc-bowshot",
-    "value": "/items/weaponabilities-azc/azc-bowshot.weaponability"
+    "value": "/items/weapons/abilities/azc-bowshot.weaponability"
   },
   {
     "op": "add",
     "path": "/azc-gunfireammo",
-    "value": "/items/weaponabilities-azc/azc-gunfireammo.weaponability"
+    "value": "/items/weapons/abilities/azc-gunfireammo.weaponability"
   },
   {
     "op": "add",
     "path": "/azc-reload",
-    "value": "/items/weaponabilities-azc/azc-reload.weaponability"
+    "value": "/items/weapons/abilities/azc-reload.weaponability"
   },
   {
     "op": "add",
     "path": "/azc-gunfireheat",
-    "value": "/items/weaponabilities-azc/azc-gunfireheat.weaponability"
+    "value": "/items/weapons/abilities/azc-gunfireheat.weaponability"
   }, 
   {
     "op": "add",
     "path": "/azc-beamfireheat",
-    "value": "/items/weaponabilities-azc/azc-beamfireheat.weaponability"
+    "value": "/items/weapons/abilities/azc-beamfireheat.weaponability"
   }
 ]
