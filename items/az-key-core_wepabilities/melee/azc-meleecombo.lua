@@ -1,10 +1,9 @@
 require "/scripts/util.lua"
-require "/items/active/weapons/weapon.lua"
 
 -- Melee primary ability
-FlurryCombo = WeaponAbility:new()
+MeleeCombo = WeaponAbility:new()
 
-function FlurryCombo:init()
+function MeleeCombo:init()
   self.comboStep = 1
 
   self.energyUsage = self.energyUsage or 0
@@ -19,13 +18,17 @@ function FlurryCombo:init()
 
   self.animKeyPrefix = self.animKeyPrefix or ""
 
+  --self.comboMode = config.getParameter("autoMode", 0)
+  -- in case a weapon ability using azc-meleecombo.lua forgets to define this value
+  if not self.comboMode then self.comboMode = 0 end
+  
   self.weapon.onLeaveAbility = function()
     self.weapon:setStance(self.stances.idle)
   end
 end
 
 -- Ticks on every update regardless if this is the active ability
-function FlurryCombo:update(dt, fireMode, shiftHeld)
+function MeleeCombo:update(dt, fireMode, shiftHeld)
   WeaponAbility.update(self, dt, fireMode, shiftHeld)
 
   if self.cooldownTimer > 0 then
@@ -54,7 +57,7 @@ function FlurryCombo:update(dt, fireMode, shiftHeld)
 end
 
 -- State: windup
-function FlurryCombo:windup()
+function MeleeCombo:windup()
   local stance = self.stances["windup"..self.comboStep]
 
   self.weapon:setStance(stance)
@@ -82,13 +85,13 @@ end
 
 -- State: wait
 -- waiting for next combo input
-function FlurryCombo:wait()
+function MeleeCombo:wait()
   local stance = self.stances["wait"..(self.comboStep - 1)]
 
   self.weapon:setStance(stance)
 
   util.wait(stance.duration, function()
-    if self:shouldContinue() then
+    if self:shouldActivate() then
       self:setState(self.windup)
       return
     end
@@ -100,7 +103,7 @@ end
 
 -- State: preslash
 -- brief frame in between windup and fire
-function FlurryCombo:preslash()
+function MeleeCombo:preslash()
   local stance = self.stances["preslash"..self.comboStep]
 
   self.weapon:setStance(stance)
@@ -112,7 +115,7 @@ function FlurryCombo:preslash()
 end
 
 -- State: fire
-function FlurryCombo:fire()
+function MeleeCombo:fire()
   local stance = self.stances["fire"..self.comboStep]
 
   self.weapon:setStance(stance)
@@ -140,10 +143,9 @@ function FlurryCombo:fire()
   end
 end
 
-function FlurryCombo:shouldActivate()
- -- if self.cooldownTimer == 0 and (self.energyUsage == 0 or not status.resourceLocked("energy")) then
-    if self.energyUsage == 0 or not status.resourceLocked("energy") then
-    if self.comboStep > 1 then
+function MeleeCombo:shouldActivate()
+  if self.cooldownTimer == 0 and (self.energyUsage == 0 or not status.resourceLocked("energy")) then
+    if self.comboMode == 0 and self.comboStep > 1 then
       return self.edgeTriggerTimer > 0
     else
       return self.fireMode == (self.activatingFireMode or self.abilitySlot)
@@ -151,19 +153,12 @@ function FlurryCombo:shouldActivate()
   end
 end
 
-function FlurryCombo:shouldContinue()
-  if self.cooldownTimer == 0 and (self.energyUsage == 0 or not status.resourceLocked("energy")) then
-      return self.fireMode == (self.activatingFireMode or self.abilitySlot)
-  end
-end
-
-
-function FlurryCombo:readyFlash()
+function MeleeCombo:readyFlash()
   animator.setGlobalTag("bladeDirectives", self.flashDirectives)
   self.flashTimer = self.flashTime
 end
 
-function FlurryCombo:computeDamageAndCooldowns()
+function MeleeCombo:computeDamageAndCooldowns()
   local attackTimes = {}
   for i = 1, self.comboSteps do
     local attackTime = self.stances["windup"..i].duration + self.stances["fire"..i].duration
@@ -192,6 +187,6 @@ function FlurryCombo:computeDamageAndCooldowns()
   end
 end
 
-function FlurryCombo:uninit()
+function MeleeCombo:uninit()
   self.weapon:setDamage()
 end

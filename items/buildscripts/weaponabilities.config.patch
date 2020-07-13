@@ -1,8 +1,8 @@
 [
   {
     "op": "add",
-    "path": "/flurrycombo",
-    "value": "/items/az-key-core_wepabilities/melee/flurrycombo.weaponability"
+    "path": "/azc-meleecombo",
+    "value": "/items/az-key-core_wepabilities/melee/azc-meleecombo.weaponability"
   },
   {
     "op": "add",

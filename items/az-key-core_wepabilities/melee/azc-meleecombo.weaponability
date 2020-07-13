@@ -9,11 +9,12 @@
   },
 
   "ability" : {
-    "name" : "Flurry Combo",
-    "type" : "flurrycombo",
-    "scripts" : ["/weapons/abilities/melee/flurrycombo.lua"],
-    "class" : "FlurryCombo",
+    "type" : "azc-meleecombo",
+    "class" : "MeleeCombo",
+    "name" : "Melee Combo",
+    "scripts" : ["/items/az-key-core_wepabilities/melee/azc-meleecombo.lua"],
 
+	"comboMode" : 0,
     "comboSteps" : 3,
 
     "flashTime" : 0.15,
