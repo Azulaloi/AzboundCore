@@ -2,31 +2,31 @@
   {
     "op": "add",
     "path": "/flurrycombo",
-    "value": "/items/weapons/abilities/flurrycombo.weaponability"
+    "value": "/items/az-key-core_wepabilities/melee/flurrycombo.weaponability"
   },
   {
     "op": "add",
     "path": "/azc-bowshot",
-    "value": "/items/weapons/abilities/azc-bowshot.weaponability"
+    "value": "/items/az-key-core_wepabilities/bow/azc-bowshot.weaponability"
   },
   {
     "op": "add",
     "path": "/azc-gunfireammo",
-    "value": "/items/weapons/abilities/azc-gunfireammo.weaponability"
+    "value": "/items/az-key-core_wepabilities/ranged/azc-gunfireammo.weaponability"
   },
   {
     "op": "add",
     "path": "/azc-reload",
-    "value": "/items/weapons/abilities/azc-reload.weaponability"
+    "value": "/items/az-key-core_wepabilities/ranged/azc-reload.weaponability"
   },
   {
     "op": "add",
     "path": "/azc-gunfireheat",
-    "value": "/items/weapons/abilities/azc-gunfireheat.weaponability"
+    "value": "/items/az-key-core_wepabilities/ranged/azc-gunfireheat.weaponability"
   }, 
   {
     "op": "add",
     "path": "/azc-beamfireheat",
-    "value": "/items/weapons/abilities/azc-beamfireheat.weaponability"
+    "value": "/items/az-key-core_wepabilities/ranged/azc-beamfireheat.weaponability"
   }
 ]

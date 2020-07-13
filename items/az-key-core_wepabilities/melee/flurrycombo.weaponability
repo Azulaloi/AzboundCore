@@ -11,7 +11,7 @@
   "ability" : {
     "name" : "Flurry Combo",
     "type" : "flurrycombo",
-    "scripts" : ["/weapons/abilities/flurrycombo.lua"],
+    "scripts" : ["/weapons/abilities/melee/flurrycombo.lua"],
     "class" : "FlurryCombo",
 
     "comboSteps" : 3,

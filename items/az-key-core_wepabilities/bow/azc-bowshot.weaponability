@@ -3,7 +3,7 @@
     "type" : "azc-bowshot",
     "class" : "BowShot",
     "name" : "Bow Shot",
-    "scripts" : ["/items/weapons/abilities/azc-bowshot.lua"],
+    "scripts" : ["/items/az-key-core_wepabilities/bow/azc-bowshot.lua"],
 
     "walkWhileFiring" : true,
 
