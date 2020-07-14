@@ -38,6 +38,8 @@ function Weapon:new(weaponConfig)
 end
 
 function Weapon:init()
+	--sb.logInfo("weapon.lua mt " .. tostring(getmetatable))
+
     self.attackTimer = 0
     self.aimAngle = 0
     self.aimDirection = 1
@@ -543,4 +545,12 @@ function Weapon:ammoCall(select)
 			end
         end
     end
+end
+
+function Weapon:test()
+	sb.logInfo("test")
+end
+
+function Weapon:testReturn()
+	return item.name()
 end
