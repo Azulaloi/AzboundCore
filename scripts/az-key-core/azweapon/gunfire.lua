@@ -12,6 +12,11 @@ function GunFire:init()
   self.weapon.onLeaveAbility = function()
     self.weapon:setStance(self.stances.idle)
   end
+  
+  -- class loader test
+  --if gunLoad ~= nil then
+  --  sb.logInfo(tostring(gunLoad.testval))
+  --end
 end
 
 function GunFire:update(dt, fireMode, shiftHeld)
