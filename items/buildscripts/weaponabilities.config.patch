@@ -28,5 +28,10 @@
     "op": "add",
     "path": "/azc-beamfireheat",
     "value": "/items/az-key-core_wepabilities/ranged/azc-beamfireheat.weaponability"
+  },  
+  {
+    "op": "add",
+    "path": "/azc-gunfireremote",
+    "value": "/items/az-key-core_wepabilities/ranged/azc-gunfireremote.weaponability"
   }
 ]

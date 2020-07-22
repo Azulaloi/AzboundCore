@@ -1,0 +1,101 @@
+{
+  "ability" : {
+    "type" : "azc-gunfireremote",
+    "class" : "GunFire",
+    "name" : "Remote Detonator",
+    "scripts" : ["/items/az-key-core_wepabilities/ranged/azc-gunfireremote.lua"],
+
+    "fireTime" : 0.6,
+    "baseDps" : 6.25,
+    "energyUsage" : 18.75,
+    "inaccuracy" : 0.025,
+
+    "projectileCount" : 1,
+	
+	// Detonation Types
+	// "hold" : fire on primaryFire, detonate on release of primaryFire
+	// "fire" : detonate on primaryFire
+	// "fireAlt" : detonate on altFire
+	"detType" : "hold",
+	
+	// Detonation Function
+	// defines detonation message string
+	"detFunction" : "detonate",
+	
+	
+	// intermittently iterate through projectiles and check if they exist 
+	// projectiles are removed automatically when they die or are detonated
+	"shouldCheck" : true,
+	"checkTime" : 5,
+	// if not false, then will sendEntityMessage(shouldCheckMessage, shouldCheckTTL)
+	// shouldCheckTTL must be longer than checkTime or else the projectile will die between checks
+	"shouldCheckMessage" : "check",  
+	"shouldCheckTTL" : 5,
+	
+	"useAmmo" : true,
+	
+    "fireType" : "semi",
+	
+	"defaultHanded" : "two",
+
+    "projectileType" : "azbulletgeneric",
+    "projectileParameters" : {
+      "knockback" : 6
+    },
+    "stances" : {
+      "idle" : {
+        "armRotation" : 0,
+        "weaponRotation" : 0,
+        "twoHanded" : true,
+
+        "allowRotate" : true,
+        "allowFlip" : true
+      },
+      "fire" : {
+        "duration" : 0,
+        "armRotation" : 3,
+        "weaponRotation" : 3,
+        "twoHanded" : true,
+
+        "allowRotate" : false,
+        "allowFlip" : false
+      },
+      "cooldown" : {
+        "duration" : 0.15,
+        "armRotation" : 3,
+        "weaponRotation" : 3,
+        "twoHanded" : true,
+
+        "allowRotate" : false,
+        "allowFlip" : false
+      },
+	  
+      "alt-idle" : {
+        "armRotation" : 0,
+        "weaponRotation" : 0,
+        "twoHanded" : false,
+
+        "allowRotate" : true,
+        "allowFlip" : true
+      },
+      "alt-fire" : {
+        "duration" : 0,
+        "armRotation" : 3,
+        "weaponRotation" : 3,
+        "twoHanded" : false,
+
+        "allowRotate" : false,
+        "allowFlip" : false
+      },
+      "alt-cooldown" : {
+        "duration" : 0.15,
+        "armRotation" : 3,
+        "weaponRotation" : 3,
+        "twoHanded" : false,
+
+        "allowRotate" : false,
+        "allowFlip" : false
+      }
+    }
+  }
+}
