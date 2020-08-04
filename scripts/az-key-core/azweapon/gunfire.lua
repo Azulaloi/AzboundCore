@@ -34,6 +34,7 @@ function GunFire:initParameters()
   self.burstTerm = ((self.burstTerm ~= nil) and self.burstTerm) or true  
   
   self.chargeMode = ((self.chargeMode ~= nil) and self.chargeMode) or false 
+  self.chargeHold = ((self.chargeHold ~= nil) and self.chargeHold) or true
   self.chargeStore = self.chargeStore or 0
   self.chargeDecay = self.chargeDecay or 1
   self.chargeMax = self.chargeMax or 2
@@ -66,7 +67,7 @@ end
 -- self.chargeMode = boolean
 --   toggles charge functionality
 
--- self.chargeStore = boolean
+-- self.chargeStore = enum (ok fine its an int)
 --   when charge state ends, 
 --     0 : charge will reset
 --     1 : charge will remain, but reset when action ends
@@ -106,9 +107,9 @@ function GunFire:update(dt, fireMode, shiftHeld)
 	
 	if flagSemi and self.chargeMode then
 		if self.charged then
-			if self.actionMode == "single" and status.overConsumeResource("energy", self:energyPerShot()) then
-				self:setState(self.fire)
-			end
+			--if self.actionMode == "single" and status.overConsumeResource("energy", self:energyPerShot()) then
+				--self:setState(self.fire) -- wait i guess im doing this logic in the state instead
+			--end
 			-- CHARGE BURST BEHAVIOR GOES HERE
 		else
 			self:setState(self.charge)
@@ -216,6 +217,8 @@ function GunFire:charge()
   --self.weapon:setStance(self.stances.charge)
   self.weapon:setStance(self.stances.fire)
   
+  playSoundSafe("charge")
+  
   --local chargeTimer = self.stances.charge.duration
   if self.chargeStore <= 1 then
 	self.chargeTimer = self.chargeMax
@@ -228,14 +231,34 @@ function GunFire:charge()
 	coroutine.yield()
   end
   
+  animator.stopAllSounds("charge")
+  
   if self.chargeTimer <= 0 then
 	self.charging = false
 	self.charged = true
-	self:setState(self.fire)
+	if self.chargeHold then self:setState(self.chargedState)
+		else self:setState(self.fire) end
   else 
 	self.charging = false
 	self:setState(self.cooldown)
   end
+end
+
+function GunFire:chargedState()
+	self.weapon:setStance(self.stances.fire)
+	
+	playSoundSafe("charged")
+	playSoundSafe("chargedLoop", -1)
+	
+	while self.fireMode == (self.activatingFireMode or self.abilitySlot) do 
+		
+		mcontroller.controlModifiers({runningSuppressed = true})
+	
+		coroutine.yield()
+	end
+	
+	animator.stopAllSounds("chargedLoop")
+	self:setState(self.fire)
 end
 
 function GunFire:cooldown()
@@ -340,4 +363,14 @@ end
 
 function round(num, dec)
 	return string.format("%." .. (dec or 0) .. "f", num)
+end
+
+function playSoundSafe(sound, loopsIn)
+	local loops = loopsIn or 0
+	if animator.hasSound(sound) then
+		animator.playSound(sound, loops)
+	else 
+		sb.logWarn("azgunfire: Item <" .. tostring(item.name)
+		.. "> tried to play undefined sound <" .. sound .. ">") 
+	end
 end
