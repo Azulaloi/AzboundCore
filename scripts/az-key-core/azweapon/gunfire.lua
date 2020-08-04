@@ -32,20 +32,31 @@ function GunFire:initParameters()
   self.triggerMode = self.triggerMode or "auto"
   self.actionMode = self.actionMode or "single"
   self.burstTerm = ((self.burstTerm ~= nil) and self.burstTerm) or true  
+  self.burstCount = self.burstCount or 3
+  self.burstTime = self.burstTime or 0.1
   
   self.chargeMode = ((self.chargeMode ~= nil) and self.chargeMode) or false 
   self.chargeHold = ((self.chargeHold ~= nil) and self.chargeHold) or true
   self.chargeStore = self.chargeStore or 0
   self.chargeDecay = self.chargeDecay or 1
   self.chargeMax = self.chargeMax or 2
-  
   self.chargeTimer = self.chargeMax
+  
+  self.inaccuracy = self.inaccuracy or 0
+  self.blooming = ((self.blooming ~= nil) and self.blooming) or false
+  self.bloomBase = self.instability or 0.005
+  self.bloomFac = self.bloomFac or 1
+  self.bloomDecay = self.bloomDecay or 3
+  self.bloomDelay = self.bloomDelay or 0
+  self.bloomMax = self.bloomMax or 0.5
   
   -- internal values
   self.fireHeld = false
   self.firedFor = false
   self.charging = false
   self.charged = false
+  self.bloom = 0
+  self.bloomTimer = 0 
 end
 
 ----
@@ -146,6 +157,8 @@ function GunFire:update(dt, fireMode, shiftHeld)
 	self.chargeTimer = math.min(self.chargeTimer + (dt * self.chargeDecay), self.chargeMax)
   end
   
+  if self.blooming then self:cycleBloom(dt) end
+  
   self:drawDebug()
 end
 
@@ -154,7 +167,12 @@ function GunFire:drawDebug()
 	
 	world.debugText("trigger:  " .. self.triggerMode, vec2.add(pos, {4, 2}), "green")
 	world.debugText("action:   " .. self.actionMode, vec2.add(pos, {4, 1.5}), "green")
-	world.debugText("cooldown: " .. round(self.cooldownTimer, 2), vec2.add(pos, {4, 1}), "green")
+	world.debugText("cooldwn:  " .. round(self.cooldownTimer, 2), vec2.add(pos, {4, 1}), "green")
+	
+	if self.blooming then
+		world.debugText("bloom:    " .. round(self.bloom, 2), vec2.add(pos, {4, 0.5}), "green")
+		world.debugText("bTimer:   " .. round(self.bloomTimer, 2), vec2.add(pos, {4, 0}), "green")
+	end
 	
 	local str0 = self.chargeMode and "true" or "false"
 	local str00 = self.chargeMode and "" or (", " .. tostring(self.chargeStore))
@@ -182,6 +200,7 @@ function GunFire:fire()
   self:muzzleFlash()
   
   self.firedFor = true
+  if self.blooming then self:addBloom() end
 
   if self.stances.fire.duration then
     util.wait(self.stances.fire.duration)
@@ -282,6 +301,21 @@ end
 -- OTHER
 ----
 
+function GunFire:addBloom(bIn)
+	local toAdd = bIn or self.bloomBase
+	self.bloom = math.min(self.bloom + (toAdd), self.bloomMax)
+	--self.bloomTimer = -0.01
+	--self.bloomTimer = -self.stances.cooldown.duration or -0.05
+	self.bloomTimer = self.bloomDelay + (-self.stances.cooldown.duration) + (-self.fireTime)
+end
+
+function GunFire:cycleBloom(dt)
+	self.bloomTimer = math.min(self.bloomTimer + dt, 2.5)
+	--self.bloom = math.min(math.max(self.bloom - (dt * (self.bloomTimer * self.bloomDecay)), 0), self.bloomMax)
+	local tmr = (self.bloomTimer > 0) and self.bloomTimer or 0 
+	self.bloom = math.max(self.bloom - (dt * (tmr * self.bloomDecay)), 0), self.bloomMax
+end
+
 function GunFire:muzzleFlash()
   animator.setPartTag("muzzleFlash", "variant", math.random(1, 3))
   animator.setAnimationState("firing", "fire")
@@ -335,7 +369,9 @@ function GunFire:firePosition()
 end
 
 function GunFire:aimVector(inaccuracy)
-  local aimVector = vec2.rotate({1, 0}, self.weapon.aimAngle + sb.nrand(inaccuracy, 0))
+  local acc = self.blooming and (inaccuracy + (self.bloom * self.bloomFac)) or inaccuracy
+  
+  local aimVector = vec2.rotate({1, 0}, self.weapon.aimAngle + sb.nrand(acc, 0))
   aimVector[1] = aimVector[1] * mcontroller.facingDirection()
   return aimVector
 end
