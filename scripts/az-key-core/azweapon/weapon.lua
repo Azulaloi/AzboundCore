@@ -222,6 +222,7 @@ function Weapon:recoilManual(a, b)
 end
 
 function Weapon:uninit()
+	--sb.logInfo("azweapon: uninit()")
     for _,ability in pairs(self.abilities) do
         if ability.uninit then
             ability:uninit(true)
@@ -229,7 +230,6 @@ function Weapon:uninit()
     end
 
     if self.recoilToggle then self:uninitCamera() end
-
 end
 
 function Weapon:uninitCamera()
