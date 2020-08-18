@@ -4,6 +4,10 @@ col = {}
 -- Warning: few to no safety checks, watch your args.
 -- WIP, needs testing, etc.
 
+------
+-- Format Converters (Dex<->Hex)
+------
+
 -- Format Converter: String to Array
 -- Takes a string, separates it into an array
 function col.hexToArray(hexIn)
@@ -136,19 +140,25 @@ function col.decToHex(decIn)
 	return string.format("%x", decIn * 255)
 end
 
+
+------
+-- Colorspace Converters
+------
+
 -- Colorspace Converter: RGB to HSL
--- Takes array of 3 floats {R, G, B}
--- Returns array of 3 floats {H, S, L}
+-- Takes array of 3 nums {R, G, B}; returns array of 3 nums {H, S, L}
 function col.rgbToHSL(rgbIn)
-    rgb = {0, 0, 0}
-    for k, v in ipairs(rgbIn) do
-        rgb[k] = rgbIn[k] / 255
+    local rgb = {0, 0, 0}
+    for i, v in ipairs(rgbIn) do
+        rgb[i] = rgbIn[i] / 255
     end
 
-    cmax = math.max(rgb[1], rgb[2], rgb[3])
-    cmin = math.min(rgb[1], rgb[2], rgb[3])
-    delta = cmax - cmin
+    local cmax = math.max(rgb[1], rgb[2], rgb[3])
+    local cmin = math.min(rgb[1], rgb[2], rgb[3])
+    local delta = cmax - cmin
 
+	-- Hue Calculation
+	local h = 0
     if delta == 0 then
         h = 0
     elseif cmax == rgb[1] then
@@ -159,35 +169,35 @@ function col.rgbToHSL(rgbIn)
         h = 60 * (((rgb[1] - rgb[2]) / delta) + 4)
     end
 
-    l = (cmax + cmin) / 2
+	-- Lightness Calculation
+    local l = (cmax + cmin) / 2
 
+	-- Saturation Calculation
+	local s = 0
     if delta == 0 then
         s = 0
     elseif delta > 0 or delta < 0 then
         s = (delta / (1 - math.abs((2 * l) - 1)))
     end
 
-    hsl = {h, s, l}
-
-    return hsl
+    return {h, s, l}
 end
 
 -- Colorspace Converter: HSL to RGB
--- Takes array of 3 floats {H, S, L}
--- Returns array of 3 floats {R, G, B}
+-- Takes array of 3 nums {H, S, L}; Returns array of 3 nums {R, G, B}
 function col.hslToRGB(hslIn)
-	hsl = {0, 0, 0}
+	local hsl = {0, 0, 0}
 	hsl[1] = hslIn[1]
 	hsl[2] = hslIn[2]
 	hsl[3] = hslIn[3]
 
-    c = (1 - math.abs((2 * hsl[3]) -1)) * hsl[2]
+    local c = (1 - math.abs((2 * hsl[3]) -1)) * hsl[2]
 
-    x = c * (1 - math.abs((hsl[1]/60) % 2 - 1))
+    local x = c * (1 - math.abs((hsl[1]/60) % 2 - 1))
 
-    m = hsl[3] - c/2
+    local m = hsl[3] - c/2
 
-    rgbp = {}
+    local rgbp = {}
     if 0 <= hsl[1] and hsl[1] < 60 then
         table.insert(rgbp, c)
         table.insert(rgbp, x)
@@ -214,7 +224,7 @@ function col.hslToRGB(hslIn)
         table.insert(rgbp, x)
     end
 
-    rgb = {}
+    local rgb = {}
     for k, v in ipairs(rgbp) do
         table.insert(rgb, (v+m) * 255)
     end
@@ -222,4 +232,97 @@ function col.hslToRGB(hslIn)
     return rgb
 end
 
--- RGB/HSL to hex for sake of completeness
+-- Colorspace Converter: RGB to HSV
+-- Takes array of 3 nums {R, G, B}; returns array of 3 nums {H, S, V}
+function col.rgbToHSV(rgbIn)
+	local rgb = {0, 0, 0}
+	for i, v in ipairs(rgbIn) do
+		rgb[i] = rgbIn[i] / 255
+	end
+	
+    local cmax = math.max(rgb[1], rgb[2], rgb[3])
+    local cmin = math.min(rgb[1], rgb[2], rgb[3])
+    local delta = cmax - cmin
+
+	-- Hue Calculation
+	local h = 0
+    if delta == 0 then
+        h = 0
+    elseif cmax == rgb[1] then
+        h = 60 * (((rgb[2] - rgb[3]) / delta) % 6)
+    elseif cmax == rgb[2] then
+        h = 60 * (((rgb[3] - rgb[1]) / delta) + 2)
+    elseif cmax == rgb[3] then
+        h = 60 * (((rgb[1] - rgb[2]) / delta) + 4)
+    end
+	
+	-- Saturation Calculation
+	local s = 0
+	if cmax == 0 then
+		s = 0
+	else s = delta/cmax end
+	
+	-- Value "Calculation"
+	local v = cmax
+	
+	return {h, s, v}
+end
+
+-- Colorspace Converter: HSV to RGB
+-- Takes array of 3 nums {H, S, V}; returns array of 3 nums {R, G, B}
+function col.hsvToRGB(hsv)
+	local s = hsv[2]
+	local v = hsv[3]
+	
+	local h = hsv[1]
+	if h >= 360 then h = 0 end
+	h = h / 60
+	
+	local i = math.floor(h)
+	local f = h - i
+	
+	local p = v * (1 - s)
+	local q = v * (1 - (s * f))
+	local t = v * (1 - (s * (1 - f)))
+	
+	local case = {
+		[0] = {v, t, p},
+		[1] = {q, v, p},
+		[2] = {p, v, t},
+		[3] = {p, q, v},
+		[4] = {t, p, v},
+		[5] = {v, p, q}
+	}
+	
+	local out = {}
+	if case[i] then out = case[i] else out = {v, p, q} end
+	return {out[1] * 255, out[2] * 255, out[3] * 255} 
+end
+
+-- Colorspace Converter: RGB to CYMK
+-- Takes array of 3 nums {R, G, B}; returns array of 4 nums {C, Y, M, K}
+function col.rgbToCYMK(rgbIn)
+	local rgb = {
+		rgbIn[1] / 255,
+		rgbIn[2] / 255,
+		rgbIn[3] / 255 }
+		
+	local k = 1 - math.max(rgb[1], rgb[2], rgb[3])
+	local c = (1 - rgb[1] - k) / (1 - k)
+	local m = (1 - rgb[2] - k) / (1 - k)
+	local y = (1 - rgb[3] - k) / (1 - k)
+	
+	return {c, y, m, k}
+end
+
+-- Colorspace Converter: CYMK to RGB
+-- Takes array of 4 nums {C, Y, M, K}; returns array of 3 nums {R, G, B}
+function col.cymkToRGB(cymk)
+	local r = 255 * (1 - cymk[1]) * (1 - cymk[4])
+	local g = 255 * (1 - cymk[3]) * (1 - cymk[4])
+	local b = 255 * (1 - cymk[2]) * (1 - cymk[4])
+	
+	return {r, g, b}
+end
+
+-- TODO: Col to hex for sake of completeness
