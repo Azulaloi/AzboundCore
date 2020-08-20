@@ -51,13 +51,25 @@ function build(directory, config, parameters, level, seed)
     end
 
     -- gun offsets
-    if config.baseOffset then
-        construct(config, "animationCustom", "animatedParts", "parts", "middle", "properties")
-        config.animationCustom.animatedParts.parts.middle.properties.offset = config.baseOffset
-        if config.muzzleOffset then
-            config.muzzleOffset = vec2.add(config.muzzleOffset, config.baseOffset)
-        end
-    end
+	if config.baseOffset then
+		if config.partKeys then
+			construct(config, "animationCustom", "animatedParts", "parts")
+			for _, part in ipairs(config.partKeys) do
+				construct(config.animationCustom.animatedParts.parts, part, "properties")
+				local preOffset = config.animationCustom.animatedParts.parts[part].properties.offset or {0, 0}
+				local newOffset = vec2.add(preOffset, config.baseOffset)
+				config.animationCustom.animatedParts.parts[part].properties.offset = newOffset
+			end
+		else
+		    construct(config, "animationCustom", "animatedParts", "parts", "middle", "properties")
+			config.animationCustom.animatedParts.parts.middle.properties.offset = config.baseOffset
+			if config.muzzleOffset then
+				config.muzzleOffset = vec2.add(config.muzzleOffset, config.baseOffset)
+			end
+		end
+		
+		if config.muzzleOffset then config.muzzleOffset = vec2.add(config.muzzleOffset, config.baseOffset) end
+	end
 
     -- populate tooltip fields
     if config.tooltipKind ~= "base" then
