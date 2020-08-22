@@ -354,6 +354,9 @@ function GunFire:fireProjectile(projectileType, projectileParams, inaccuracy, fi
       )
   end
   
+  if (self.ejectEnable) or (self.ejectType) then self:ejectCasing() end
+  
+  -- Recoil Cam
   if self.weapon.recoilToggle then
       self.weapon:recoil({
           (math.random(self.recoilXAlpha) - self.recoilXBeta) / self.recoilXDividend,
@@ -363,9 +366,77 @@ function GunFire:fireProjectile(projectileType, projectileParams, inaccuracy, fi
   return projectileId
 end
 
-function GunFire:firePosition()
-	--return activeItem.ownerAimPosition()
-  return vec2.add(mcontroller.position(), activeItem.handPosition(self.weapon.muzzleOffset))
+
+-- temp docs, im tired
+-- todo: change the offset to not be based on muzzle pos!!!!
+
+-- "ejectEnable" - force enables eject behavior with default projectile
+-- "ejectType" - projectile type to eject (also enables eject behavior)
+-- "ejectOffset" - vec2 offset from firePos to eject at
+-- "ejectAngle" - angle in degrees to offset eject direction from aim angle by
+-- "ejectFuzz - amount by which the angle can fuzz in either direction
+-- "ejectSpeed" - speed (float or [min, max]) of ejected proj
+-- "ejectCount" - number of projectiles to eject
+function GunFire:ejectCasing(paramsIn, angleIn, angleFuzz, quantity)
+  -- default doesn't exist yet so don't use it
+  local projType = self.ejectType or "az-key_case-gen"
+  
+  local eParams = {}
+  if paramsIn ~= nil then eParams = sb.jsonMerge({}, paramsIn) end
+  
+  -- Position
+  local pPos = {0, 0}
+  local pPosOffset = self.ejectOffset or {-0.5, 0}
+  pPos = self:firePosition(pPosOffset)
+  
+  -- Rotation
+  --local f = self.ejectFuzz or 5
+  --local fuzz = util.randomInRange(-f, f) 
+  local fuzz = sb.nrand(self.ejectFuzz or 5)
+  local ang = self.ejectAngle and (self.ejectAngle + fuzz) or (180 + fuzz)
+  local pVector = vec2.rotate({1, 0}, self.weapon.aimAngle + self:toRadians(ang))
+  --local pVector = vec2.rotate({1, 0}, self.weapon.aimAngle)
+  --pVector = vec2.rotate(pVector, self:toRadians(ang))
+  pVector[1] = pVector[1] * mcontroller.facingDirection()
+  --sb.logInfo("eject fuzz: " .. tostring(fuzz))
+  --sb.logInfo("eject ang: " .. tostring(ang))
+  
+  -- Speed
+  local s = self.ejectSpeed or {3, 6}
+  local spd = util.randomInRange(s)
+  eParams.speed = spd
+  --sb.logInfo("eject speed: " .. tostring(spd))
+  
+  -- Spawn
+  local projId = 0
+  for i = 1, (quantity or self.ejectCount or 1) do
+	
+	projId = world.spawnProjectile(
+	  projType,
+	  pPos,
+	  activeItem.ownerEntityId(),
+	  pVector,
+	  false,
+	  eParams
+	)
+  end
+  
+  return projectileId
+end
+
+function GunFire:toRadians(degrees)
+  return degrees * math.pi/180
+end
+
+function GunFire:firePosition(offsetIn)
+  --local relativePos = vec2.add(self.weapon.muzzleOffset, (offsetIn or {0, 0}))
+
+  -- it's probably cheaper to do a boolean check than vector arithmetic, right?
+  -- or would it be better without branching?
+  local relativePos = self.weapon.muzzleOffset
+  if offsetIn then relativePos = vec2.add(relativePos, offsetIn) end
+  
+  return vec2.add(mcontroller.position(), activeItem.handPosition(relativePos))
 end
 
 function GunFire:aimVector(inaccuracy)
