@@ -12,8 +12,8 @@ addClass("ptrail", projectile.getParameter("pc-trail_priority", 100))
 -- By should, I mean: Az, you better keep them equivalent, you slag
 
 function ptrail:init()
-	self.lastPos = nil
-	self.lastVel = nil
+	self.lastPos = mcontroller.position()
+	self.lastVel = mcontroller.velocity()
 	
 	local function gcf(str, def) return config.getParameter("pc-trail_" .. str, def) end
 	
@@ -57,13 +57,33 @@ function ptrail:update(dt)
 	self.delayTimer = self.delayTimer - 1
 	
 	if self.delayTimer < 1 then
-		local lv = self.mnum * vec2.mag(mcontroller.velocity())
+		local pos = mcontroller.position()
+		local vel = mcontroller.velocity()
+	
+		local lv = self.mnum * vec2.mag(vel)
 		
-		local trail = ptrail:spawnTrails(mcontroller.position(), mcontroller.velocity(), lv, false, true)
+		local steps = 8
+		local trail = false
+		
+		if (steps > 0) then
+			-- Linear interpolation
+			local mlv = lv / (steps + 1)
+			trail = ptrail:spawnTrails(pos, vel, mlv, false, true)
+			
+			local points = ptrail:lerpPoints(self.lastPos, pos, steps)
+			for i = 1, steps do
+				if points[i] then
+					ptrail:spawnTrails(points[i], vel, mlv, false, true, true)
+				end
+			end
+		else
+			-- No interpolation
+			trail = ptrail:spawnTrails(pos, vel, lv, false, true)
+		end
 		
 		if trail then 
-			self.lastPos = mcontroller.position()
-			self.lastVel = mcontroller.velocity()
+			self.lastPos = pos
+			self.lastVel = vel
 		end
 	end
 end
@@ -87,10 +107,10 @@ function ptrail:destroy()
 	end
 end
 
-function ptrail:spawnTrails(posIn, velIn, lengthIn, destBool, velBool)
+function ptrail:spawnTrails(posIn, velIn, lengthIn, destBool, velBool, interpBool)
 	local trail = nil
 	for i = 1, self.trailQuantity do
-		trail = ptrail:spawnTrail(posIn, velIn, lengthIn, destBool, velBool, i)
+		trail = ptrail:spawnTrail(posIn, velIn, lengthIn, destBool, velBool, i, (interpBool or false))
 	end
 	
 	-- this could be made to return a table of projectiles, rather than the most recently created,
@@ -98,7 +118,7 @@ function ptrail:spawnTrails(posIn, velIn, lengthIn, destBool, velBool)
 	return trail
 end
 
-function ptrail:spawnTrail(posIn, velIn, lengthIn, destBool, velBool, iter)
+function ptrail:spawnTrail(posIn, velIn, lengthIn, destBool, velBool, iter, interpBool)
 	local param = self.trailConfigs[iter]
 
 	useVel = velBool or true
@@ -119,6 +139,9 @@ function ptrail:spawnTrail(posIn, velIn, lengthIn, destBool, velBool, iter)
 		v = vec2.sub(self.lastPos, posIn)
 		v = ptrail:alongAngle(v, velIn, (lengthIn / 8) * 2)
 	end
+	
+	-- Temporary interp highlight color
+	local prepColor = (interpBool and {255, 0, 0, 200}) or (param.color or self.default.color)
 
 	return world.spawnProjectile("azdebug", projPos, 0, {0, 0}, false, {
 	timeToLive = 0.0,
@@ -131,7 +154,7 @@ function ptrail:spawnTrail(posIn, velIn, lengthIn, destBool, velBool, iter)
           fullbright = param.fullbright or 			self.default.fullbright,
           destructionAction = param.destAction or 	self.default.destAction,
           size = param.thiccness or 				self.default.thiccness,
-          color = param.color or 					self.default.color,
+          color = prepColor,
           collidesForeground = false,
           length = lengthIn,
           position = v,
@@ -166,4 +189,25 @@ function ptrail:alongAngle(pos, angle, dist)
 	local u = vec2.norm(angle)
 	local du = vec2.mul(u, dist)
 	return vec2.add(pos, du)
+end
+
+function ptrail:lerpPoints(pA, pB, steps)
+	local delta = {pA[1] - pB[1], pA[2] - pB[2]}
+	delta = ptrail:vecFlip(delta)
+	
+	local inter = {delta[1] / (steps + 1), delta[2] / (steps + 1)}
+	
+	local points = {}
+	for i = 1, steps do
+		local m = vec2.mul(inter, i)
+		--p = {pA[1] + (inter[1] * i), pA[2] + (inter[2] * i)}
+		p = {pA[1] + m[1], pA[2] + m[2]}
+		table.insert(points, p)
+	end
+	
+	return points
+end
+
+function ptrail:vecFlip(vec)
+	return {-vec[1], -vec[2]}
 end
